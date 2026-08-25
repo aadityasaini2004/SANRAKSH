@@ -1,7 +1,0 @@
-.env
-local.properties
-.gradle/
-build/
-.idea/
-*.iml
-node_modules/
