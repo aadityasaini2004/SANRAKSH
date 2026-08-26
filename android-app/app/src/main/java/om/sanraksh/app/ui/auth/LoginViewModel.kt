@@ -1,4 +1,5 @@
 package om.sanraksh.app.ui.auth
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -8,6 +9,7 @@ import kotlinx.coroutines.launch
 import om.sanraksh.app.data.model.LoginRequest
 import om.sanraksh.app.data.remote.RetrofitClient
 import om.sanraksh.app.data.repository.AuthRepository
+import om.sanraksh.app.data.local.TokenManager
 
 data class LoginUiState(
     val isLoading: Boolean = false,
@@ -20,6 +22,9 @@ class LoginViewModel : ViewModel() {
 
     private val repository =
         AuthRepository(RetrofitClient.apiService)
+
+    private val tokenManager =
+        RetrofitClient.tokenManager
 
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
@@ -42,6 +47,19 @@ class LoginViewModel : ViewModel() {
             val result = repository.login(request)
 
             result.onSuccess { response ->
+
+                val accessToken = response.token?.accessToken
+                val refreshToken = response.token?.refreshToken
+
+                if (
+                    !accessToken.isNullOrBlank() &&
+                    !refreshToken.isNullOrBlank()
+                ) {
+                    tokenManager.saveTokens(
+                        accessToken = accessToken,
+                        refreshToken = refreshToken
+                    )
+                }
 
                 _uiState.value = LoginUiState(
                     isLoading = false,
