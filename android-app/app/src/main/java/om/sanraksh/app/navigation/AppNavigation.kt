@@ -1,6 +1,5 @@
 package om.sanraksh.app.navigation
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.compose.NavHost
@@ -10,6 +9,7 @@ import om.sanraksh.app.data.remote.RetrofitClient
 import om.sanraksh.app.ui.auth.LoginScreen
 import om.sanraksh.app.ui.auth.RegisterScreen
 import om.sanraksh.app.ui.elder.ElderHomeScreen
+import om.sanraksh.app.ui.family.FamilyHomeScreen
 
 object Routes {
     const val LOGIN = "login"
@@ -89,7 +89,15 @@ fun AppNavigation() {
             if (!accessToken.isNullOrBlank()) {
 
                 ElderHomeScreen(
-                    accessToken = accessToken
+                    accessToken = accessToken,
+                    onLogoutClick = {
+                        RetrofitClient.tokenManager.clearTokens()
+                        navController.navigate(Routes.LOGIN) {
+                            popUpTo(0) {
+                                inclusive = true
+                            }
+                        }
+                    }
                 )
 
             } else {
@@ -109,9 +117,33 @@ fun AppNavigation() {
 
         composable(Routes.FAMILY_HOME) {
 
-            Text(
-                text = "Family Dashboard - Coming Soon"
-            )
+            val accessToken =
+                RetrofitClient.tokenManager.getAccessToken()
+
+            if (!accessToken.isNullOrBlank()) {
+
+                FamilyHomeScreen(
+                    onLogoutClick = {
+                        RetrofitClient.tokenManager.clearTokens()
+                        navController.navigate(Routes.LOGIN) {
+                            popUpTo(0) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                )
+
+            } else {
+
+                LaunchedEffect(Unit) {
+
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(0) {
+                            inclusive = true
+                        }
+                    }
+                }
+            }
         }
     }
 }

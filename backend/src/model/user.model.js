@@ -42,7 +42,14 @@ const userSchema = new mongoose.Schema({
     refreshToken: {
         type: String,
         default: null,
-    }
+    },
+
+    linkedElders: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+        }
+    ],
 
 
 }, {timestamps: true});
