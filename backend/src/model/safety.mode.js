@@ -25,6 +25,9 @@ const safetyEventSchema = new mongoose.Schema(
     }
 );
 
+// Index for efficient queries by userId and createdAt
+safetyEventSchema.index({ userId: 1, createdAt: -1 });
+
 const safetyEventModel = mongoose.model("SafetyEvent", safetyEventSchema);
 
 export default safetyEventModel;
