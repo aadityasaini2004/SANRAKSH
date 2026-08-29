@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "npx nodemon src/server.js",
-    "start": "npm start src/server.js"
+    "start": "npm start src/server.js",
+    "backfill:sanraksh": "node scripts/backfill-sanraksh-id.js"
   },
   "keywords": [],
   "author": "",

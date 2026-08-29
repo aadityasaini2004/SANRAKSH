@@ -25,7 +25,7 @@ data class FamilyUiState(
     val selectedElderEvents: List<SafetyEvent> = emptyList(),
     val isEventsLoading: Boolean = false,
     val errorMessage: String = "",
-    val linkElderId: String = "",
+    val linkSanrakshId: String = "",
     val isLinking: Boolean = false,
     val linkSuccess: Boolean = false,
     val linkError: String = ""
@@ -142,16 +142,16 @@ class FamilyViewModel : ViewModel() {
         )
     }
 
-    fun updateLinkElderId(id: String) {
-        _uiState.value = _uiState.value.copy(linkElderId = id)
+    fun updateLinkSanrakshId(id: String) {
+        _uiState.value = _uiState.value.copy(linkSanrakshId = id)
     }
 
     fun linkElder() {
         val token = tokenManager.getAccessToken() ?: return
-        val elderId = _uiState.value.linkElderId.trim()
+        val sanrakshId = _uiState.value.linkSanrakshId.trim()
 
-        if (elderId.isEmpty()) {
-            _uiState.value = _uiState.value.copy(linkError = "Please enter an Elder ID")
+        if (sanrakshId.isEmpty()) {
+            _uiState.value = _uiState.value.copy(linkError = "Please enter a Sanraksh ID")
             return
         }
 
@@ -162,12 +162,12 @@ class FamilyViewModel : ViewModel() {
                 linkSuccess = false
             )
 
-            val result = repository.linkElder(token, elderId)
+            val result = repository.linkElder(token, sanrakshId)
             result.onSuccess { response ->
                 _uiState.value = _uiState.value.copy(
                     isLinking = false,
                     linkSuccess = true,
-                    linkElderId = ""
+                    linkSanrakshId = ""
                 )
                 // Reload elders to include the newly linked one
                 loadElders()
@@ -182,7 +182,7 @@ class FamilyViewModel : ViewModel() {
 
     fun dismissLinkSheet() {
         _uiState.value = _uiState.value.copy(
-            linkElderId = "",
+            linkSanrakshId = "",
             isLinking = false,
             linkSuccess = false,
             linkError = ""

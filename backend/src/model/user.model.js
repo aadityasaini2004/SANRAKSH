@@ -44,6 +44,16 @@ const userSchema = new mongoose.Schema({
         default: null,
     },
 
+    sanrakshId: {
+        type: String,
+        unique: true,
+        sparse: true,
+        uppercase: true,
+        trim: true,
+        index: true,
+        default: null,
+    },
+
     linkedElders: [
         {
             type: mongoose.Schema.Types.ObjectId,

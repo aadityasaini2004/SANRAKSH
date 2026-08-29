@@ -104,7 +104,7 @@ fun FamilyHomeScreen(
                 showLinkSheet = false
                 viewModel.dismissLinkSheet()
             },
-            onIdChange = { viewModel.updateLinkElderId(it) },
+            onIdChange = { viewModel.updateLinkSanrakshId(it) },
             onLink = { viewModel.linkElder() }
         )
     }
@@ -536,7 +536,7 @@ private fun LinkElderSheet(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Enter the Elder ID to link their account.",
+                text = "Enter the Sanraksh ID shared by the elder.",
                 style = MaterialTheme.typography.bodyLarge,
                 color = OnSurfaceVariant
             )
@@ -544,9 +544,10 @@ private fun LinkElderSheet(
             Spacer(modifier = Modifier.height(24.dp))
 
             OutlinedTextField(
-                value = uiState.linkElderId,
+                value = uiState.linkSanrakshId,
                 onValueChange = onIdChange,
-                label = { Text("Elder ID") },
+                label = { Text("Sanraksh ID") },
+                placeholder = { Text("e.g. SNR-7K4P92") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),

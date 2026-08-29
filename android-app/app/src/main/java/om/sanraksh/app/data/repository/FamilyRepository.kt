@@ -74,28 +74,30 @@ class FamilyRepository {
 
     suspend fun linkElder(
         accessToken: String,
-        elderId: String
+        sanrakshId: String
     ): Result<LinkElderResponse> {
         return try {
+            // Normalize: trim whitespace and convert to uppercase
+            val normalizedId = sanrakshId.trim().uppercase()
+
             val response = apiService.linkElder(
                 authorization = "Bearer $accessToken",
-                request = LinkElderRequest(elderId = elderId)
+                request = LinkElderRequest(sanrakshId = normalizedId)
             )
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {
-                val errorBody = response.errorBody()?.string()
                 val message = when (response.code()) {
-                    400 -> "Invalid Elder ID"
-                    404 -> "Elder not found"
-                    409 -> "Elder is already linked"
-                    403 -> "You don't have permission to link this elder"
-                    else -> "Failed to link elder: ${response.code()}"
+                    400 -> "Please enter a valid Sanraksh ID."
+                    404 -> "No elder was found with this Sanraksh ID."
+                    409 -> "This elder is already linked to your account."
+                    403 -> "You don't have permission to link this elder."
+                    else -> "Unable to link elder. Please try again."
                 }
                 Result.failure(Exception(message))
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(Exception("Unable to connect. Please try again."))
         }
     }
 }

@@ -3,7 +3,7 @@ package om.sanraksh.app.data.model
 // ── Request models ──
 
 data class LinkElderRequest(
-    val elderId: String
+    val sanrakshId: String
 )
 
 // ── Response models ──
@@ -14,7 +14,8 @@ data class FamilyElder(
     val email: String,
     val phoneNumber: String,
     val avatar: String?,
-    val role: String
+    val role: String,
+    val sanrakshId: String? = null
 )
 
 data class FamilyEldersResponse(
