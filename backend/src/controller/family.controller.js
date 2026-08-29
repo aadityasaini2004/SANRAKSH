@@ -5,31 +5,26 @@ import safetyEventModel from "../model/safety.mode.js";
 // ── POST /api/family/link-elder ──
 export async function linkElder(req, res) {
     try {
-        const { elderId } = req.body;
+        let { sanrakshId } = req.body;
 
-        // Validate elderId is provided
-        if (!elderId) {
+        // Validate sanrakshId is provided
+        if (!sanrakshId) {
             return res.status(400).json({
                 success: false,
-                message: "elderId is required!"
+                message: "Invalid or missing Sanraksh ID!"
             });
         }
 
-        // Validate elderId is a valid ObjectId
-        if (!mongoose.Types.ObjectId.isValid(elderId)) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid elderId format!"
-            });
-        }
+        // Normalize to uppercase and trim
+        sanrakshId = sanrakshId.trim().toUpperCase();
 
-        // Find the target user
-        const elder = await userModel.findById(elderId);
+        // Find the target user by sanrakshId
+        const elder = await userModel.findOne({ sanrakshId });
 
         if (!elder) {
             return res.status(404).json({
                 success: false,
-                message: "Elder not found!"
+                message: "No elder found with this Sanraksh ID!"
             });
         }
 
@@ -42,7 +37,7 @@ export async function linkElder(req, res) {
         }
 
         // Prevent linking self
-        if (req.user._id.toString() === elderId) {
+        if (req.user._id.toString() === elder._id.toString()) {
             return res.status(400).json({
                 success: false,
                 message: "Cannot link your own account!"
@@ -50,7 +45,7 @@ export async function linkElder(req, res) {
         }
 
         // Check for duplicate linking
-        if (req.user.linkedElders && req.user.linkedElders.some(id => id.toString() === elderId)) {
+        if (req.user.linkedElders && req.user.linkedElders.some(id => id.toString() === elder._id.toString())) {
             return res.status(409).json({
                 success: false,
                 message: "Elder is already linked!"
@@ -61,7 +56,7 @@ export async function linkElder(req, res) {
         if (!req.user.linkedElders) {
             req.user.linkedElders = [];
         }
-        req.user.linkedElders.push(elderId);
+        req.user.linkedElders.push(elder._id);
         await req.user.save();
 
         return res.status(200).json({
@@ -73,7 +68,8 @@ export async function linkElder(req, res) {
                 email: elder.email,
                 phoneNumber: elder.phoneNumber,
                 avatar: elder.avatar,
-                role: elder.role
+                role: elder.role,
+                sanrakshId: elder.sanrakshId,
             }
         });
 
@@ -91,7 +87,7 @@ export async function getLinkedElders(req, res) {
     try {
         // Populate linkedElders with safe fields only
         const user = await userModel.findById(req.user._id)
-            .populate("linkedElders", "name email phoneNumber avatar role");
+            .populate("linkedElders", "name email phoneNumber avatar role sanrakshId");
 
         if (!user.linkedElders || user.linkedElders.length === 0) {
             return res.status(200).json({

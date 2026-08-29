@@ -2,6 +2,7 @@ import userModel from "../model/user.model.js";
 import config from "../config/config.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { generateSanrakshId } from "../utils/sanrakshId.js";
 
 export async function register(req, res) {
     try {
@@ -25,24 +26,37 @@ export async function register(req, res) {
 
         const hashPassword = await bcrypt.hash(password, 10);
 
+        // Generate sanrakshId only for elder accounts
+        let sanrakshId = null;
+        if (role === "elder") {
+            sanrakshId = await generateSanrakshId();
+        }
+
         const user = await userModel.create({
             name: name,
             email: email,
             password: hashPassword,
             phoneNumber,
-            role
+            role,
+            sanrakshId,
         });
+
+        const safeUser = {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            phoneNumber: user.phoneNumber,
+            role: user.role,
+        };
+
+        if (role === "elder" && user.sanrakshId) {
+            safeUser.sanrakshId = user.sanrakshId;
+        }
 
         return res.status(201).json({
             success: true,
-            message: "User registered successful!",
-            user: {
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                phoneNumber: user.phoneNumber,
-                role: user.role,
-            }
+            message: "User registered successfully!",
+            user: safeUser
         })
 
     } catch(error) {
@@ -100,17 +114,24 @@ export async function login(req, res) {
         user.refreshToken = refreshToken;
         await user.save();
 
+        const safeUser = {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            phoneNumber: user.phoneNumber,
+            role: user.role,
+        };
+
+        // Include sanrakshId for elder accounts
+        if (user.role === "elder" && user.sanrakshId) {
+            safeUser.sanrakshId = user.sanrakshId;
+        }
+
         return res.status(200).json({
             success: true,
-            message: "User Login successful!",
+            message: "User login successful!",
 
-            user: {
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                phoneNumber: user.phoneNumber,
-                role: user.role,
-            },
+            user: safeUser,
 
             token: {
                 accessToken: accessToken,
@@ -159,21 +180,26 @@ export async function refreshToken(req, res) {
             expiresIn: "15m"
         });
 
+        const safeUser = {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            phoneNumber: user.phoneNumber,
+            role: user.role,
+        };
+
+        if (user.role === "elder" && user.sanrakshId) {
+            safeUser.sanrakshId = user.sanrakshId;
+        }
+
         return res.status(200).json({
             success: true,
             message: "new access token generated!",
-            user: {
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                phoneNumber: user.phoneNumber,
-                role: user.role,
-            },
+            user: safeUser,
             token: {
                 accessToken: newAccessToken,
             }
         })
-        
         
     
     } catch(error) {

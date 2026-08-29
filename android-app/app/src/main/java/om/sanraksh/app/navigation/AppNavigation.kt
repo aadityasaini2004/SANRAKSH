@@ -9,12 +9,14 @@ import om.sanraksh.app.data.remote.RetrofitClient
 import om.sanraksh.app.ui.auth.LoginScreen
 import om.sanraksh.app.ui.auth.RegisterScreen
 import om.sanraksh.app.ui.elder.ElderHomeScreen
+import om.sanraksh.app.ui.elder.ElderProfileScreen
 import om.sanraksh.app.ui.family.FamilyHomeScreen
 
 object Routes {
     const val LOGIN = "login"
     const val REGISTER = "register"
     const val ELDER_HOME = "elder_home"
+    const val ELDER_PROFILE = "elder_profile"
     const val FAMILY_HOME = "family_home"
 }
 
@@ -91,12 +93,15 @@ fun AppNavigation() {
                 ElderHomeScreen(
                     accessToken = accessToken,
                     onLogoutClick = {
-                        RetrofitClient.tokenManager.clearTokens()
+                        RetrofitClient.tokenManager.clearAll()
                         navController.navigate(Routes.LOGIN) {
                             popUpTo(0) {
                                 inclusive = true
                             }
                         }
+                    },
+                    onProfileClick = {
+                        navController.navigate(Routes.ELDER_PROFILE)
                     }
                 )
 
@@ -113,6 +118,20 @@ fun AppNavigation() {
             }
         }
 
+        // ---------------- ELDER PROFILE ----------------
+
+        composable(Routes.ELDER_PROFILE) {
+
+            val user = RetrofitClient.tokenManager.getSavedUser()
+
+            ElderProfileScreen(
+                sanrakshId = user?.sanrakshId,
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
         // ---------------- FAMILY HOME ----------------
 
         composable(Routes.FAMILY_HOME) {
@@ -124,7 +143,7 @@ fun AppNavigation() {
 
                 FamilyHomeScreen(
                     onLogoutClick = {
-                        RetrofitClient.tokenManager.clearTokens()
+                        RetrofitClient.tokenManager.clearAll()
                         navController.navigate(Routes.LOGIN) {
                             popUpTo(0) {
                                 inclusive = true

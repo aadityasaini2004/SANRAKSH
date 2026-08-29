@@ -4,15 +4,21 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,13 +40,13 @@ import om.sanraksh.app.ui.components.SanrakshEmergencyButton
 import om.sanraksh.app.ui.components.SanrakshErrorCard
 import om.sanraksh.app.ui.components.SanrakshStatusCard
 import om.sanraksh.app.ui.components.SanrakshSuccessBanner
-import om.sanraksh.app.ui.components.SanrakshTopBar
 import om.sanraksh.app.ui.theme.*
 
 @Composable
 fun ElderHomeScreen(
     accessToken: String,
     onLogoutClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
     viewModel: ElderViewModel = viewModel()
 ) {
 
@@ -83,9 +89,41 @@ fun ElderHomeScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             // ── Top Bar ──
-            SanrakshTopBar(
-                onLogoutClick = onLogoutClick
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Surface)
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Sanraksh",
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = Primary,
+                    fontSize = 24.sp,
+                    letterSpacing = 2.sp,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 16.dp)
+                )
+                IconButton(onClick = onProfileClick) {
+                    Icon(
+                        imageVector = Icons.Filled.Person,
+                        contentDescription = "Profile",
+                        tint = OnSurfaceVariant,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                IconButton(onClick = onLogoutClick) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Logout,
+                        contentDescription = "Logout",
+                        tint = OnSurfaceVariant,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
 
             Column(
                 modifier = Modifier

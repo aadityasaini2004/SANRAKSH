@@ -61,6 +61,17 @@ class LoginViewModel : ViewModel() {
                     )
                 }
 
+                // Save user info for profile access
+                response.user?.let { user ->
+                    tokenManager.saveUser(
+                        userId = user._id,
+                        name = user.name,
+                        email = user.email,
+                        role = user.role,
+                        sanrakshId = user.sanrakshId
+                    )
+                }
+
                 _uiState.value = LoginUiState(
                     isLoading = false,
                     success = response.success,
